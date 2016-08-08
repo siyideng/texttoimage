@@ -24,16 +24,22 @@ validateattributes(font_type, {'char'}, {});
 [j, i] = ismember(lower(font_type), 'bi');
 font_type = sum(i(j));
 
-[path_file, ~, ~] = fileparts(mfilename('fullpath'));
-javaaddpath(path_file);
-
-import java.awt.Font;
-r = RastFont.rasterize(Font(font_name, font_type, font_size), txt);
-c = cell(numel(r), 1);
-for i = 1:numel(r)
-    t = r(i);
-    c{i} = reshape(typecast(t(1), 'uint8'), [t(2), t(3)]).';
+n = numel(txt);
+c = cell(n, 1);
+sss = java.lang.String(txt);
+font = java.awt.Font(font_name, font_type, font_size);
+render_context = java.awt.font.FontRenderContext([], true, true);
+for i = 0:n-1
+    bounds = font.getStringBounds(sss.substring(i, i+1), render_context);
+    w = round(bounds.getWidth());
+    h = round(bounds.getHeight()*2);
+    bi = java.awt.image.BufferedImage(w, h, java.awt.image.BufferedImage.TYPE_BYTE_GRAY);
+    g = bi.getGraphics();
+    g.setFont(font);
+    g.drawString(sss.substring(i, i+1), 0, round(h*2/3));
+    t = bi.getRaster().getDataBuffer().getData();
+    c{i+1} = reshape(typecast(t, 'uint8'), [w, h]).';
 end
-javarmpath(path_file);
+
 end
 

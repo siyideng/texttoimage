@@ -17,4 +17,4 @@ c = texttoimage('離離原上草', 600, 'SimSun');
 figure; imagesc(cat(2, c{:})); axis image;
 ```
 
-![Result:](/rast.PNG)
+![Result:](/example.png)
